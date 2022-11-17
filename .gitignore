@@ -133,3 +133,5 @@ refs/
 *.png
 example/**/output
 example/**/preprocessed_inputs
+
+.idea
