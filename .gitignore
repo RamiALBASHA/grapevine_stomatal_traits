@@ -131,3 +131,5 @@ dmypy.json
 
 refs/
 *.png
+example/**/output
+example/**/preprocessed_inputs
