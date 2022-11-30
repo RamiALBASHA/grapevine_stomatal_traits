@@ -2,7 +2,7 @@
 simple shoot architecture.
 """
 
-from json import load, dump
+from json import dump
 from pathlib import Path
 
 from hydroshoot import io, initialisation
@@ -10,7 +10,6 @@ from openalea.mtg.mtg import MTG
 from openalea.plantgl.all import Scene
 
 from example.potted_grapevine.sim import build_mtg
-from simulator import hydroshoot_wrapper
 
 
 def preprocess_inputs(grapevine_mtg: MTG, path_project_dir: Path, psi_soil: float, gdd_since_budbreak: float,
@@ -26,6 +25,7 @@ def preprocess_inputs(grapevine_mtg: MTG, path_project_dir: Path, psi_soil: floa
     dynamic_data = {}
     inputs_hourly = io.HydroShootHourlyInputs(psi_soil=inputs.psi_soil_forced, sun2scene=inputs.sun2scene)
     for date_sim in inputs.params.simulation.date_range:
+        print(date_sim)
         inputs_hourly.update(
             g=grapevine_mtg, date_sim=date_sim, hourly_weather=inputs.weather[inputs.weather.index == date_sim],
             psi_pd=inputs.psi_pd, params=inputs.params)
@@ -40,12 +40,11 @@ def preprocess_inputs(grapevine_mtg: MTG, path_project_dir: Path, psi_soil: floa
             'Eabs': grapevine_mtg.property('Eabs')}})
 
     path_preprocessed_inputs = path_project_dir / 'preprocessed_inputs'
-    with open(path_preprocessed_inputs / 'static.json', mode='w') as f_prop:
-        dump(static_data, f_prop)
-    pass
-    with open(path_preprocessed_inputs / 'dynamic.json', mode='w') as f_prop:
-        dump(dynamic_data, f_prop)
-    pass
+    path_preprocessed_inputs.mkdir(parents=True, exist_ok=True)
+    for s, data in (('static.json', static_data), ('dynamic.json', dynamic_data)):
+        path_output = path_preprocessed_inputs / s
+        with open(path_output, mode='w') as f_prop:
+            dump(static_data, f_prop)
 
 
 if __name__ == '__main__':
@@ -53,16 +52,5 @@ if __name__ == '__main__':
     path_preprocessed_data = path_project / 'preprocessed_inputs'
 
     g, scene = build_mtg(path_file=path_project / 'digit.csv', is_show_scene=False)
-    # preprocess_inputs(grapevine_mtg=g, path_project_dir=path_project, psi_soil=-0.5, gdd_since_budbreak=1000., scene=scene)
-
-    with open(path_preprocessed_data / 'static.json') as f:
-        static_inputs = load(f)
-    with open(path_preprocessed_data / 'dynamic.json') as f:
-        dynamic_inputs = load(f)
-
-    summary_results = hydroshoot_wrapper.run(
-        g=g, wd=path_project, scene=scene, psi_soil_init=-0.5, gdd_since_budbreak=1000.,
-        form_factors=static_inputs['form_factors'],
-        leaf_nitrogen=static_inputs['Na'],
-        leaf_ppfd=dynamic_inputs,
-        path_output=path_project / 'output' / 'time_series_with_preprocessed_data.csv')
+    preprocess_inputs(grapevine_mtg=g, path_project_dir=path_project, psi_soil=-0.5, gdd_since_budbreak=1000.,
+                      scene=scene)
