@@ -56,7 +56,7 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: 
     for s, data in (('static.json', static_data), ('dynamic.json', dynamic_data)):
         path_output = path_preprocessed_inputs / s
         with open(path_output, mode='w') as f_prop:
-            dump(static_data, f_prop)
+            dump(data, f_prop)
 
 
 if __name__ == '__main__':
