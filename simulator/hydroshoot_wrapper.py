@@ -71,6 +71,7 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
     g = init_model(g=g, inputs=inputs)
 
     irrigation_rate = 0.
+    irrigation_remain = 0.
     if any([k in kwargs for k in ('irrigation_freq', 'drip_rate', 'replacement_fraction')]):
         is_irrigation = True
         drip_rate = kwargs['drip_rate']
@@ -100,6 +101,7 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
     an_ls = []
     rg_ls = []
     irrigation_ls = []
+    psi_soil_ls = []
     leaf_temperature_dict = {}
 
     # The time loop +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -110,15 +112,18 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
         print("=" * 72)
         print(f'Date: {date}\n')
         if is_irrigation:
-            irrigation_rate, irrigation_remain = handle_irrigation(
-                date_sim=date,
-                date_start_irrigation=date_start_irrigation,
-                irrigation_freq=irrigation_freq,
-                sapflow=sapflow,
-                drip_rate=drip_rate,
-                replacement_fraction=replacement_fraction,
-                irrigation_to_apply=irrigation_rate)
-            irrigation_rate = irrigation_remain
+            if date >= date_start_irrigation:
+                irrigation_rate, irrigation_remain = handle_irrigation(
+                    date_sim=date,
+                    date_start_irrigation=date_start_irrigation,
+                    irrigation_freq=irrigation_freq,
+                    sapflow=sapflow,
+                    drip_rate=drip_rate,
+                    replacement_fraction=replacement_fraction,
+                    irrigation_to_apply=irrigation_remain)
+            else:
+                irrigation_rate = 0
+                irrigation_remain = 0
         irrigation_ls.append(irrigation_rate)
 
         inputs_hourly.update(g=g, date_sim=date, hourly_weather=inputs.weather[inputs.weather.index == date],
@@ -151,6 +156,8 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
                  for vid in g.property('geometry') if g.node(vid).label.startswith('L')]))
 
         an_ls.append(g.node(g.node(g.root).vid_collar).FluxC)
+
+        psi_soil_ls.append(g.node(g.node(g.root).vid_collar).psi_head)
 
         leaf_temperature_dict[date] = deepcopy(g.property('Tlc'))
 
@@ -190,7 +197,10 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
         'E': sapflow,
         # 'sapEast': sapEast,
         # 'sapWest': sapWest,
-        'Tleaf': t_ls}, index=params.simulation.date_range)
+        'Tleaf': t_ls,
+        'irr': irrigation_ls,
+        'psi_soil': psi_soil_ls},
+        index=params.simulation.date_range)
 
     # Write
     if write_result:
