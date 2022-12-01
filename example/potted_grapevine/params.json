@@ -172,7 +172,7 @@
     }
   },
   "soil": {
-    "soil_class": "Sand",
+    "soil_class": "Clay_Loam",
     "soil_dimensions": [
       3.6,
       1.0,
