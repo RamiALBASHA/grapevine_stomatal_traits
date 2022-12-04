@@ -4,7 +4,7 @@ from statistics import median
 import openalea.mtg.mtg
 from hydroshoot import architecture, display
 from matplotlib import pyplot, image, colors
-from numpy import zeros, arange, array
+from numpy import zeros, arange, array, quantile
 from openalea.mtg import traversal
 from openalea.plantgl.all import Scene
 from openalea.plantgl.all import surface as surf
@@ -40,7 +40,17 @@ def calc_total_leaf_area(g: openalea.mtg.mtg.MTG) -> float:
     return total_leaf_area * 1.e-4
 
 
-def calc_canopy_volume(g: openalea.mtg.mtg.MTG) -> float:
+def calc_canopy_volume(g: openalea.mtg.mtg.MTG, training_system_name: str) -> float:
+    if training_system_name == 'sprawl':
+        res = calc_sprawl_canopy_volume(g=g)
+    elif training_system_name == 'vsp':
+        res = calc_sprawl_canopy_volume(g=g)
+    else:
+        raise KeyError(f'unknown training system name: "{training_system_name}"')
+    return res
+
+
+def calc_sprawl_canopy_volume(g: openalea.mtg.mtg.MTG) -> float:
     """This function supposes that the canopy is aligned to the X axis."""
     x_coords, y_coords, z_coords = zip(*list(g.property('TopPosition').values()))
 
@@ -58,16 +68,51 @@ def calc_canopy_volume(g: openalea.mtg.mtg.MTG) -> float:
     return 0.5 * (width_at_top + width_at_base) * height * 1.e-4
 
 
-def get_sprawl_leaf_area_density_from_ref():
+def calc_vsp_canopy_volume(g: openalea.mtg.mtg.MTG) -> float:
+    """This function supposes that the canopy is aligned to the X axis."""
+    x_coords, y_coords, z_coords = zip(*list(g.property('TopPosition').values()))
+
+    canes_mtg_nodes = [g.node(vid).components() for vid in g.VtxList(Scale=2)
+                       if all([g.node(vid).label.startswith('sh'), 'II' not in g.node(vid).label])]
+    canes_internoodes = []
+    for n_group in canes_mtg_nodes:
+        canes_internoodes.append([n for n in n_group if all([n.label.startswith('in'), 'II' not in n.label])][-1])
+    height_canes = median([n.properties()['TopPosition'][-1] for n in canes_internoodes])
+
+    cordon_nodes = [g.node(vid).components() for vid in g.VtxList(Scale=2) if g.node(vid).label.startswith('arm')]
+    height_cordon = median([n.properties()['TopPosition'][-1] for n_group in cordon_nodes for n in n_group])
+    height = height_canes - height_cordon
+    y_positive = quantile([y for y in y_coords if y >= 0], 0.85)
+    y_negative = quantile([y for y in y_coords if y <= 0], 0.15)
+    width = y_positive - y_negative
+    # length = max(x_coords) - min(x_coords)
+
+    return width * height * 1.e-4
+
+
+def get_leaf_area_density_from_ref(training_system_name: str):
     """Grid is taken from Gladstone and Dokoozlian (2003) Vitis 42 (3), 123 – 131"""
-    return ([0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [1.9, 5.3, 9.2, 3.7, 0.4],
-            [6, 10.5, 7.6, 9.7, 6.6],
-            [7.4, 3.6, 0, 8.5, 4.8],
-            [7.3, 1, 0, 2.2, 7.1],
-            [5.6, 0, 0, 0.9, 6.5])
+    if training_system_name == 'sprawl':
+        res = ([0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0],
+               [1.9, 5.3, 9.2, 3.7, 0.4],
+               [6, 10.5, 7.6, 9.7, 6.6],
+               [7.4, 3.6, 0, 8.5, 4.8],
+               [7.3, 1, 0, 2.2, 7.1],
+               [5.6, 0, 0, 0.9, 6.5])
+    elif training_system_name == 'vsp':
+        res = ([0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0],
+               [0, 0, 7.4, 0, 0],
+               [0, 0, 10.3, 0, 0],
+               [0, 0, 12.9, 0, 0],
+               [0, 0, 2.0, 0, 0],
+               [0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0])
+    else:
+        raise KeyError(f'unknown training system name: "{training_system_name}"')
+    return res
 
 
 def plot_leaf_area_density(data: array, ax: pyplot.Subplot = None, norm: colors.Normalize = None,
@@ -126,14 +171,15 @@ def plot_mtg_leaf_area_density(g: openalea.mtg.mtg.MTG, path_fig: Path) -> None:
     pass
 
 
-def compare_leaf_area_density(g: openalea.mtg.mtg.MTG, path_fig: Path):
+def compare_leaf_area_density(g: openalea.mtg.mtg.MTG, training_system_name: str, path_fig: Path):
     leaf_area_density_mtg, y_bounds, z_bounds = calc_leaf_area_density(g=g)
-    leaf_area_density_ref = get_sprawl_leaf_area_density_from_ref()
+    leaf_area_density_ref = get_leaf_area_density_from_ref(training_system_name=training_system_name)
 
     norm = colors.Normalize(0, vmax=10)
     fig, (ax_ref, ax_mtg, ax_cbar) = pyplot.subplots(ncols=3, gridspec_kw=dict(width_ratios=[10, 10, 1]))
     ax_ref, im_ref = plot_leaf_area_density(data=array(leaf_area_density_ref), norm=norm, ax=ax_ref)
     ax_mtg, im_mtg = plot_leaf_area_density(data=leaf_area_density_mtg, norm=norm, ax=ax_mtg)
+    ax_cbar.grid(False)
     cbar = ax_cbar.figure.colorbar(im_ref, cax=ax_cbar, orientation="vertical")
     cbar.ax.set_ylabel(' '.join(('Leaf area density', r'$\mathregular{m^2\/m^{-3}}$')), rotation=270, labelpad=20)
     for ax, s in ((ax_ref, 'ref'), (ax_mtg, 'mtg')):
@@ -156,10 +202,15 @@ def compare_leaf_area_density(g: openalea.mtg.mtg.MTG, path_fig: Path):
 
 if __name__ == '__main__':
     path_root = Path(__file__).parent
-    grapevine_mtg = build_mtg(
-        path_csv=path_root / 'virtual_digit.csv',
-        is_cordon_preferential_orientation=True)
-    scene = display.visu(grapevine_mtg, def_elmnt_color_dict=True, scene=Scene(), view_result=True)
-    compare_leaf_area_density(g=grapevine_mtg, path_fig=path_root / 'leaf_area_density_mtg.png')
-    print(f'total leaf area = {calc_total_leaf_area(g=grapevine_mtg):.2f} m²')
-    print(f'canopy volume = {calc_canopy_volume(g=grapevine_mtg):.2f} m3/m-1')
+    for training_system in ('vsp', 'sprawl'):
+        path_training = path_root / training_system
+        grapevine_mtg = build_mtg(
+            path_csv=path_training / 'virtual_digit.csv',
+            is_cordon_preferential_orientation=True)
+        scene = display.visu(grapevine_mtg, def_elmnt_color_dict=True, scene=Scene(), view_result=True)
+        compare_leaf_area_density(
+            g=grapevine_mtg,
+            training_system_name=training_system,
+            path_fig=path_training / 'leaf_area_density_mtg.png')
+        print(f'total leaf area = {calc_total_leaf_area(g=grapevine_mtg):.2f} m²')
+        print(f'canopy volume = {calc_canopy_volume(g=grapevine_mtg, training_system_name=training_system):.2f} m3/m-1')
