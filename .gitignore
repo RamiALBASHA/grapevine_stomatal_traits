@@ -139,3 +139,4 @@ example/**/preprocessed_inputs
 sims/**/output
 sims/**/preprocessed_inputs
 sims/**/params.json
+sources/misc/
