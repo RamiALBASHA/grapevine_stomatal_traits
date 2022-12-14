@@ -6,13 +6,17 @@ from hydroshoot.architecture import vine_orientation
 from openalea.mtg import mtg
 from openalea.plantgl.scenegraph import Scene
 
-from sources.config import SiteData
-from sources.mockups.main_mockups import build_mtg
+from grapevine_stomatal_traits.sources.config import SiteData
+from grapevine_stomatal_traits.sources.mockups.main_mockups import build_mtg
 
 PATH_PARAMS_BASE = Path(__file__).parent / 'params_base.json'
 
 
-def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: float, scene: Scene, **kwargs):
+def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: float, scene: Scene,
+                      is_write_hourly_dynamic: bool = False, **kwargs):
+    path_preprocessed_inputs = path_project_dir / 'preprocessed_inputs'
+    path_preprocessed_inputs.mkdir(parents=True, exist_ok=True)
+
     inputs = io.HydroShootInputs(
         g=grapevine_mtg, path_project=path_project_dir, scene=scene, psi_soil=psi_soil, **kwargs)
     io.verify_inputs(g=grapevine_mtg, inputs=inputs)
@@ -20,6 +24,9 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: 
 
     static_data = {'form_factors': {s: grapevine_mtg.property(s) for s in ('ff_sky', 'ff_leaves', 'ff_soil')}}
     static_data.update({'Na': grapevine_mtg.property('Na')})
+
+    with open(path_preprocessed_inputs / 'static.json', mode='w') as f:
+        dump(static_data, f, indent=2)
 
     dynamic_data = {}
     inputs_hourly = io.HydroShootHourlyInputs(psi_soil=inputs.psi_soil_forced, sun2scene=inputs.sun2scene)
@@ -33,17 +40,19 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: 
             g=grapevine_mtg, inputs_hourly=inputs_hourly, leaf_ppfd=inputs.leaf_ppfd,
             params=inputs.params)
 
-        dynamic_data.update({grapevine_mtg.date: {
+        dynamic_data_per_date = {
             'diffuse_to_total_irradiance_ratio': diffuse_to_total_irradiance_ratio,
             'Ei': grapevine_mtg.property('Ei'),
-            'Eabs': grapevine_mtg.property('Eabs')}})
+            'Eabs': grapevine_mtg.property('Eabs')}
 
-    path_preprocessed_inputs = path_project_dir / 'preprocessed_inputs'
-    path_preprocessed_inputs.mkdir(parents=True, exist_ok=True)
-    for s, data in (('static.json', static_data), ('dynamic.json', dynamic_data)):
-        path_output = path_preprocessed_inputs / s
-        with open(path_output, mode='w') as f_prop:
-            dump(data, f_prop)
+        if is_write_hourly_dynamic:
+            with open(path_preprocessed_inputs / f'dynamic_{grapevine_mtg.date}.json', mode='w') as f:
+                dump(dynamic_data_per_date, f, indent=2)
+
+        dynamic_data.update({grapevine_mtg.date: dynamic_data_per_date})
+
+    with open(path_preprocessed_inputs / f'dynamic.json', mode='w') as f:
+        dump(dynamic_data, f, indent=2)
 
 
 def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: float, weather_file: str) -> dict:

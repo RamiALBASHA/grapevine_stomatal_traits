@@ -8,7 +8,7 @@ from hydroshoot import architecture, display
 from openalea.mtg import traversal, mtg
 from openalea.plantgl.all import Scene
 
-from sims.preprocess_functions import preprocess_inputs
+from grapevine_stomatal_traits.sims.preprocess_functions import preprocess_inputs
 
 
 def build_mtg(path_file: Path, is_show_scene: bool = True) -> (mtg.MTG, Scene):

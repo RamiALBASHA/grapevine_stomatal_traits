@@ -4,9 +4,9 @@ from pathlib import Path
 from hydroshoot.display import visu
 from openalea.plantgl.all import Scene
 
-from sims.fresno.config import SiteDataFresno
-from sims.preprocess_functions import prepare_params, preprocess_inputs, prepare_mtg
-from sources.config import ScenariosTraits
+from grapevine_stomatal_traits.sims.fresno.config import SiteDataFresno
+from grapevine_stomatal_traits.sims.preprocess_functions import prepare_params, preprocess_inputs, prepare_mtg
+from grapevine_stomatal_traits.sources.config import ScenariosTraits
 
 
 def set_params(path_project_dir: Path, rotation_angle: float, weather_file: str):
@@ -19,7 +19,7 @@ def set_params(path_project_dir: Path, rotation_angle: float, weather_file: str)
 
 
 if __name__ == '__main__':
-    path_root = Path(__file__).parent
+    path_root = Path(__file__).parent.resolve()
 
     for weather_scenario in ('historical', 'rcp45', 'rcp85'):
         for row_orientation, row_angle in (('n_s', 0.), ('ne_sw', 45.), ('e_w', 90.)):

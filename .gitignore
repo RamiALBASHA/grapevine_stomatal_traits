@@ -136,7 +136,7 @@ example/**/preprocessed_inputs
 
 .idea
 
-sims/**/output
-sims/**/preprocessed_inputs
-sims/**/params.json
-sources/misc/
+**/sims/**/output
+**/sims/**/preprocessed_inputs
+**/sims/**/params.json
+**/sources/misc/

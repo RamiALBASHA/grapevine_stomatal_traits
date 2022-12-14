@@ -1,4 +1,4 @@
-from sources.config import SiteData
+from grapevine_stomatal_traits.sources.config import SiteData
 
 
 class SiteDataFresno(SiteData):
