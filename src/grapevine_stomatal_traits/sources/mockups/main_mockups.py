@@ -1,18 +1,26 @@
 from pathlib import Path
 from statistics import median
 
-import openalea.mtg.mtg
 from hydroshoot import architecture, display
 from matplotlib import pyplot, image, colors
 from numpy import zeros, arange, array, quantile
 from openalea.mtg import traversal
+from openalea.mtg.mtg import MTG
 from openalea.plantgl.all import Scene
 from openalea.plantgl.all import surface as surf
 
 
-def build_mtg(path_csv: Path, is_cordon_preferential_orientation: bool = False) -> openalea.mtg.mtg.MTG:
+def build_mtg(path_csv: Path, training_system_name: str, is_cordon_preferential_orientation: bool = False) -> MTG:
     g = architecture.vine_mtg(file_path=path_csv)
     cordon_vector = architecture.cordon_vector(g=g)[1] if is_cordon_preferential_orientation else None
+    if training_system_name == 'sprawl':
+        g = _build_mtg_sprawl(g=g, cordon_vector=cordon_vector)
+    elif training_system_name == 'vsp':
+        g = _build_mtg_vsp(g=g, cordon_vector=cordon_vector)
+    return g
+
+
+def _build_mtg_sprawl(g: MTG, cordon_vector: list) -> MTG:
     for v in traversal.iter_mtg2(g, g.root):
         architecture.vine_phyto_modular(g, v)
         architecture.vine_axeII(g, v, phyllo_angle=180., PT_init=0.5, insert_angle=46.,
@@ -31,7 +39,26 @@ def build_mtg(path_csv: Path, is_cordon_preferential_orientation: bool = False) 
     return g
 
 
-def calc_total_leaf_area(g: openalea.mtg.mtg.MTG) -> float:
+def _build_mtg_vsp(g: MTG, cordon_vector: list) -> MTG:
+    for v in traversal.iter_mtg2(g, g.root):
+        architecture.vine_phyto_modular(g, v)
+        architecture.vine_axeII(g, v, phyllo_angle=180., PT_init=0.5, insert_angle=46.,
+                                insert_angle_CI=4.6, pruning_type='avg_field_model',
+                                N_init=0.18, N_max=6, N_max_order=4, in_order_max=35,
+                                slope_nfii=5.7, phyto_type='P0', a_L=43.718, b_L=-37.663,
+                                a_P=1.722, b_P=10.136, c_P=-5.435, Fifty_cent=400.,
+                                slope_curv=70., curv_type='convexe')
+        architecture.vine_petiole(g, v, pet_ins=90., pet_ins_cv=0., phyllo_angle=180.)
+        architecture.vine_leaf(g, v, leaf_inc=-45., leaf_inc_cv=100., lim_max=12.0, lim_min=5., order_lim_max=6,
+                               max_order=55, rand_rot_angle=90.,
+                               cordon_vector=cordon_vector)
+        architecture.vine_mtg_properties(g, v)
+        architecture.vine_mtg_geometry(g, v)
+        architecture.vine_transform(g, v)
+    return g
+
+
+def calc_total_leaf_area(g: MTG) -> float:
     total_leaf_area = 0
     for vid in g.VtxList(Scale=3):
         n = g.node(vid)
@@ -40,7 +67,7 @@ def calc_total_leaf_area(g: openalea.mtg.mtg.MTG) -> float:
     return total_leaf_area * 1.e-4
 
 
-def calc_canopy_volume(g: openalea.mtg.mtg.MTG, training_system_name: str) -> float:
+def calc_canopy_volume(g: MTG, training_system_name: str) -> float:
     if training_system_name == 'sprawl':
         res = calc_sprawl_canopy_volume(g=g)
     elif training_system_name == 'vsp':
@@ -50,7 +77,7 @@ def calc_canopy_volume(g: openalea.mtg.mtg.MTG, training_system_name: str) -> fl
     return res
 
 
-def calc_sprawl_canopy_volume(g: openalea.mtg.mtg.MTG) -> float:
+def calc_sprawl_canopy_volume(g: MTG) -> float:
     """This function supposes that the canopy is aligned to the X axis."""
     x_coords, y_coords, z_coords = zip(*list(g.property('TopPosition').values()))
 
@@ -68,7 +95,7 @@ def calc_sprawl_canopy_volume(g: openalea.mtg.mtg.MTG) -> float:
     return 0.5 * (width_at_top + width_at_base) * height * 1.e-4
 
 
-def calc_vsp_canopy_volume(g: openalea.mtg.mtg.MTG) -> float:
+def calc_vsp_canopy_volume(g: MTG) -> float:
     """This function supposes that the canopy is aligned to the X axis."""
     x_coords, y_coords, z_coords = zip(*list(g.property('TopPosition').values()))
 
@@ -133,7 +160,7 @@ def plot_leaf_area_density(data: array, ax: pyplot.Subplot = None, norm: colors.
     return ax, im
 
 
-def calc_leaf_area_density(g: openalea.mtg.mtg.MTG) -> (array, list, list):
+def calc_leaf_area_density(g: MTG) -> (array, list, list):
     """Grid is taken from Gladstone and Dokoozlian (2003) Vitis 42 (3), 123 – 131,
     This function supposes that the canopy is aligned to the X axis."""
     x_coords, *_ = zip(*list(g.property('TopPosition').values()))
@@ -157,7 +184,7 @@ def calc_leaf_area_density(g: openalea.mtg.mtg.MTG) -> (array, list, list):
     return leaf_area_density, y_bounds, z_bounds
 
 
-def plot_mtg_leaf_area_density(g: openalea.mtg.mtg.MTG, path_fig: Path) -> None:
+def plot_mtg_leaf_area_density(g: MTG, path_fig: Path) -> None:
     leaf_area_density, y_bounds, z_bounds = calc_leaf_area_density(g=g)
 
     ax, im = plot_leaf_area_density(data=leaf_area_density)
@@ -171,7 +198,7 @@ def plot_mtg_leaf_area_density(g: openalea.mtg.mtg.MTG, path_fig: Path) -> None:
     pass
 
 
-def compare_leaf_area_density(g: openalea.mtg.mtg.MTG, training_system_name: str, path_fig: Path):
+def compare_leaf_area_density(g: MTG, training_system_name: str, path_fig: Path):
     leaf_area_density_mtg, y_bounds, z_bounds = calc_leaf_area_density(g=g)
     leaf_area_density_ref = get_leaf_area_density_from_ref(training_system_name=training_system_name)
 
@@ -206,6 +233,7 @@ if __name__ == '__main__':
         path_training = path_root / training_system
         grapevine_mtg = build_mtg(
             path_csv=path_training / 'virtual_digit.csv',
+            training_system_name=training_system,
             is_cordon_preferential_orientation=True)
         scene = display.visu(grapevine_mtg, def_elmnt_color_dict=True, scene=Scene(), view_result=True)
         compare_leaf_area_density(

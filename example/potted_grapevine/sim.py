@@ -6,7 +6,7 @@ from json import load
 from pathlib import Path
 
 from example.potted_grapevine.main_preprocess import build_mtg
-from simulator import hydroshoot_wrapper
+from grapevine_stomatal_traits.simulator import hydroshoot_wrapper
 
 if __name__ == '__main__':
     path_project = Path(__file__).parent

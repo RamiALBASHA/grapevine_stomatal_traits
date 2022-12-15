@@ -12,10 +12,9 @@ from grapevine_stomatal_traits.sources.mockups.main_mockups import build_mtg
 PATH_PARAMS_BASE = Path(__file__).parent / 'params_base.json'
 
 
-def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: float, scene: Scene,
-                      is_write_hourly_dynamic: bool = False, **kwargs):
-    path_preprocessed_inputs = path_project_dir / 'preprocessed_inputs'
-    path_preprocessed_inputs.mkdir(parents=True, exist_ok=True)
+def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, path_preprocessed_inputs_dir: Path,
+                      psi_soil: float, scene: Scene, is_write_hourly_dynamic: bool = False, **kwargs):
+    path_preprocessed_inputs_dir.mkdir(parents=True, exist_ok=True)
 
     inputs = io.HydroShootInputs(
         g=grapevine_mtg, path_project=path_project_dir, scene=scene, psi_soil=psi_soil, **kwargs)
@@ -25,7 +24,7 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: 
     static_data = {'form_factors': {s: grapevine_mtg.property(s) for s in ('ff_sky', 'ff_leaves', 'ff_soil')}}
     static_data.update({'Na': grapevine_mtg.property('Na')})
 
-    with open(path_preprocessed_inputs / 'static.json', mode='w') as f:
+    with open(path_preprocessed_inputs_dir / 'static.json', mode='w') as f:
         dump(static_data, f, indent=2)
 
     dynamic_data = {}
@@ -46,12 +45,12 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, psi_soil: 
             'Eabs': grapevine_mtg.property('Eabs')}
 
         if is_write_hourly_dynamic:
-            with open(path_preprocessed_inputs / f'dynamic_{grapevine_mtg.date}.json', mode='w') as f:
+            with open(path_preprocessed_inputs_dir / f'dynamic_{grapevine_mtg.date}.json', mode='w') as f:
                 dump(dynamic_data_per_date, f, indent=2)
 
         dynamic_data.update({grapevine_mtg.date: dynamic_data_per_date})
 
-    with open(path_preprocessed_inputs / f'dynamic.json', mode='w') as f:
+    with open(path_preprocessed_inputs_dir / f'dynamic.json', mode='w') as f:
         dump(dynamic_data, f, indent=2)
 
 
@@ -77,8 +76,11 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
     return params
 
 
-def prepare_mtg(path_digit: Path, rotation_angle: float, is_leaf_follow_cordon: bool = True):
-    g = build_mtg(path_csv=path_digit, is_cordon_preferential_orientation=is_leaf_follow_cordon)
+def prepare_mtg(path_digit: Path, training_system: str, rotation_angle: float, is_leaf_follow_cordon: bool = True):
+    g = build_mtg(
+        path_csv=path_digit,
+        training_system_name=training_system,
+        is_cordon_preferential_orientation=is_leaf_follow_cordon)
     for v in mtg.traversal.iter_mtg2(g, g.root):
         vine_orientation(g, v, rotation_angle, local_rotation=False)
     return g
