@@ -3,6 +3,7 @@ from pathlib import Path
 
 from hydroshoot import io, initialisation
 from hydroshoot.architecture import vine_orientation
+from hydroshoot.display import visu
 from openalea.mtg import mtg
 from openalea.plantgl.scenegraph import Scene
 
@@ -54,7 +55,7 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, path_prepr
         dump(dynamic_data, f, indent=2)
 
 
-def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: float, weather_file: str) -> dict:
+def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: float, weather_file_name: str) -> dict:
     with open(PATH_PARAMS_BASE, mode='r') as f:
         params = load(f)
     params['simulation'].update({
@@ -63,7 +64,7 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
         "latitude": site_data.latitude,
         "longitude": site_data.longitude,
         "elevation": site_data.elevation,
-        "meteo": weather_file})
+        "meteo": f'../../{weather_file_name}'})
     params['irradiance'].update({'scene_rotation': scene_rotation})
     params['phenology'].update({'emdate': site_data.date_budburst})
     params['exchange']['par_gs'].update(stomatal_params)
@@ -76,6 +77,15 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
     return params
 
 
+def set_params(path_project_dir: Path, site_data: SiteData, stomatal_params: dict, rotation_angle: float,
+               weather_file: str):
+    params = prepare_params(site_data=site_data, stomatal_params=stomatal_params, scene_rotation=rotation_angle,
+                            weather_file_name=weather_file)
+    with open(path_project_dir / 'params.json', mode='w') as f:
+        dump(params, f, indent=2)
+    pass
+
+
 def prepare_mtg(path_digit: Path, training_system: str, rotation_angle: float, is_leaf_follow_cordon: bool = True):
     g = build_mtg(
         path_csv=path_digit,
@@ -84,3 +94,27 @@ def prepare_mtg(path_digit: Path, training_system: str, rotation_angle: float, i
     for v in mtg.traversal.iter_mtg2(g, g.root):
         vine_orientation(g, v, rotation_angle, local_rotation=False)
     return g
+
+
+def preprocess_inputs_and_params(path_digit: Path, path_preprocessed_dir: Path,
+                                 training_system: str, site_data: SiteData, weather_file_name: str,
+                                 stomatal_params: dict, row_angle_from_south: float, gdd_since_budbreak: float = 1000.):
+    set_params(
+        path_project_dir=path_preprocessed_dir,
+        site_data=site_data,
+        stomatal_params=stomatal_params,
+        rotation_angle=row_angle_from_south,
+        weather_file=weather_file_name)
+    grapevine_mtg = prepare_mtg(
+        path_digit=path_digit,
+        training_system=training_system,
+        rotation_angle=row_angle_from_south)
+    scene = visu(grapevine_mtg, def_elmnt_color_dict=True, scene=Scene(), view_result=False)
+    preprocess_inputs(
+        grapevine_mtg=grapevine_mtg,
+        path_project_dir=path_preprocessed_dir,
+        path_preprocessed_inputs_dir=path_preprocessed_dir,
+        gdd_since_budbreak=gdd_since_budbreak,
+        psi_soil=0,
+        scene=scene,
+        is_write_hourly_dynamic=True)
