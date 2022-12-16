@@ -7,7 +7,7 @@ from hydroshoot.display import visu
 from openalea.mtg import mtg
 from openalea.plantgl.scenegraph import Scene
 
-from grapevine_stomatal_traits.sources.config import SiteData
+from grapevine_stomatal_traits.sources.config import SiteData, ScenariosRowAngle
 from grapevine_stomatal_traits.sources.mockups.main_mockups import build_mtg
 
 PATH_PARAMS_BASE = Path(__file__).parent / 'params_base.json'
@@ -96,9 +96,17 @@ def prepare_mtg(path_digit: Path, training_system: str, rotation_angle: float, i
     return g
 
 
-def preprocess_inputs_and_params(path_digit: Path, path_preprocessed_dir: Path,
-                                 training_system: str, site_data: SiteData, weather_file_name: str,
-                                 stomatal_params: dict, row_angle_from_south: float, gdd_since_budbreak: float = 1000.):
+def preprocess_inputs_and_params(path_root: Path,
+                                 site_data: SiteData, weather_file_name: str,
+                                 stomatal_params: dict, row_angle_scenario: ScenariosRowAngle,
+                                 gdd_since_budbreak: float = 1000.):
+    training_system = site_data.training_system
+    path_digit = path_root.parents[1] / f'sources/mockups/{training_system}/virtual_digit.csv'
+
+    row_angle_from_south = row_angle_scenario.value
+    path_preprocessed_dir = path_root / 'preprocessed_inputs' / row_angle_scenario.name
+    path_preprocessed_dir.mkdir(parents=True, exist_ok=True)
+
     set_params(
         path_project_dir=path_preprocessed_dir,
         site_data=site_data,

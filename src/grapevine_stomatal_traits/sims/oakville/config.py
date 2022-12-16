@@ -10,6 +10,7 @@ class SiteDataOakville(SiteData):
             latitude=38.43,
             longitude=-122.41,
             elevation=58,
+            training_system='vsp',
             soil_class='Clay_Loam',
             spacing_interrow=1.8,
             spacing_intrarow=1.8,

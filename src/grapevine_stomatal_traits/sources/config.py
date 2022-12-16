@@ -3,7 +3,8 @@ from enum import Enum
 
 class SiteData(object):
     def __init__(self, date_start_sim: str, date_end_sim: str, date_budburst: str, latitude: float, longitude: float,
-                 elevation: float, soil_class: str, spacing_interrow: float, spacing_intrarow: float, soil_depth: float,
+                 elevation: float, training_system: str, soil_class: str, spacing_interrow: float,
+                 spacing_intrarow: float, soil_depth: float,
                  rhyzo_coeff: float):
         self.date_start_sim = date_start_sim
         self.date_end_sim = date_end_sim
@@ -11,6 +12,7 @@ class SiteData(object):
         self.latitude = latitude
         self.longitude = longitude
         self.elevation = elevation
+        self.training_system = training_system
         self.soil_class = soil_class
         self.spacing_interrow = spacing_interrow
         self.spacing_intrarow = spacing_intrarow
@@ -27,5 +29,7 @@ class ScenariosTraits(Enum):
     elite: dict = {"g0": 0.01165, 'm0': 0.8925, 'psi0': -0.85}
 
 
-class ScenariosField(Enum):
-    scene_rotation: list = [0., 45., 90.]
+class ScenariosRowAngle(Enum):
+    north_south: float = 0.
+    northeast_southwest: float = 45.
+    east_west: float = 90.

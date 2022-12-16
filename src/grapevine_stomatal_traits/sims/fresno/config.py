@@ -10,6 +10,7 @@ class SiteDataFresno(SiteData):
             latitude=36.82,
             longitude=-119.74,
             elevation=104,
+            training_system='sprawl',
             soil_class='Clay_Loam',
             spacing_interrow=1.8,
             spacing_intrarow=2.2,
