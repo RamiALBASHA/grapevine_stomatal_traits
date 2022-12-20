@@ -14,8 +14,8 @@ from openalea.mtg.mtg import MTG
 from openalea.plantgl.all import Scene, surface
 from pandas import DataFrame
 
-from simulator.inputs import HydroShootHourlyInputs
-from simulator.irrigation import handle_irrigation
+from grapevine_stomatal_traits.simulator.inputs import HydroShootHourlyInputs
+from grapevine_stomatal_traits.simulator.irrigation import handle_irrigation
 
 
 def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_output: Path = None,
