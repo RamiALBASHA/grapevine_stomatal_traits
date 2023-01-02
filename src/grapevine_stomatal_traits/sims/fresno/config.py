@@ -1,12 +1,13 @@
-from grapevine_stomatal_traits.sources.config import SiteData
+from datetime import datetime
+from enum import Enum
+
+from grapevine_stomatal_traits.sources.config import SiteData, PhenoData
 
 
 class SiteDataFresno(SiteData):
-    def __init__(self):
+    def __init__(self, pheno_data: PhenoData):
         super(SiteDataFresno, self).__init__(
-            date_start_sim='1990-07-12 00:00:00',
-            date_end_sim='1990-08-11 23:00:00',
-            date_budburst='1990-04-01 00:00:00',
+            pheno_data=pheno_data,
             latitude=36.82,
             longitude=-119.74,
             elevation=104,
@@ -16,3 +17,18 @@ class SiteDataFresno(SiteData):
             spacing_intrarow=2.2,
             soil_depth=2.,
             rhyzo_coeff=0.75)
+
+
+class ScenariosDatesFresno(Enum):
+    historical: PhenoData = PhenoData(
+        date_budburst=datetime(1990, 3, 25),
+        date_veraison=datetime(1990, 7, 15),
+        gdd_since_budbreak=98)
+    rcp45: PhenoData = PhenoData(
+        date_budburst=datetime(1990, 2, 27),
+        date_veraison=datetime(1990, 6, 20),
+        gdd_since_budbreak=99)
+    rcp85: PhenoData = PhenoData(
+        date_budburst=datetime(1990, 2, 7),
+        date_veraison=datetime(1990, 6, 6),
+        gdd_since_budbreak=99)

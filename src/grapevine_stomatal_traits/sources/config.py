@@ -1,14 +1,28 @@
+from datetime import datetime
 from enum import Enum
+
+from dateutil.relativedelta import relativedelta
+
+SCENARIOS_CLIMATE = ('historical', 'rcp45', 'rcp85')
+
+
+class PhenoData:
+    def __init__(self, date_budburst: datetime, date_veraison: datetime, gdd_since_budbreak: float):
+        self.date_budbreak = date_budburst
+        self.date_start_sim = date_veraison
+        self.date_end_sim = date_veraison + relativedelta(months=+1, days=-1)
+        self.gdd_since_budbreak = gdd_since_budbreak
 
 
 class SiteData(object):
-    def __init__(self, date_start_sim: str, date_end_sim: str, date_budburst: str, latitude: float, longitude: float,
+    def __init__(self, pheno_data: PhenoData, latitude: float, longitude: float,
                  elevation: float, training_system: str, soil_class: str, spacing_interrow: float,
                  spacing_intrarow: float, soil_depth: float,
                  rhyzo_coeff: float):
-        self.date_start_sim = date_start_sim
-        self.date_end_sim = date_end_sim
-        self.date_budburst = date_budburst
+        self.date_budburst = pheno_data.date_budbreak
+        self.date_start_sim = pheno_data.date_start_sim
+        self.date_end_sim = pheno_data.date_end_sim
+        self.gdd_since_budbreak = pheno_data.gdd_since_budbreak
         self.latitude = latitude
         self.longitude = longitude
         self.elevation = elevation

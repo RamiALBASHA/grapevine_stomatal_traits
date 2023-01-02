@@ -1,12 +1,13 @@
-from grapevine_stomatal_traits.sources.config import SiteData
+from datetime import datetime
+from enum import Enum
+
+from grapevine_stomatal_traits.sources.config import SiteData, PhenoData
 
 
 class SiteDataOakville(SiteData):
-    def __init__(self):
+    def __init__(self, pheno_data: PhenoData):
         super(SiteDataOakville, self).__init__(
-            date_start_sim='1990-07-31 00:00:00',
-            date_end_sim='1990-08-30 23:00:00',
-            date_budburst='1990-04-01 00:00:00',
+            pheno_data=pheno_data,
             latitude=38.43,
             longitude=-122.41,
             elevation=58,
@@ -16,3 +17,18 @@ class SiteDataOakville(SiteData):
             spacing_intrarow=1.8,
             soil_depth=2.,
             rhyzo_coeff=0.75)
+
+
+class ScenariosDatesOakville(Enum):
+    historical: PhenoData = PhenoData(
+        date_budburst=datetime(1990, 4, 1),
+        date_veraison=datetime(1990, 7, 30),
+        gdd_since_budbreak=96)
+    rcp45: PhenoData = PhenoData(
+        date_budburst=datetime(1990, 3, 8),
+        date_veraison=datetime(1990, 7, 2),
+        gdd_since_budbreak=96)
+    rcp85: PhenoData = PhenoData(
+        date_budburst=datetime(1990, 2, 15),
+        date_veraison=datetime(1990, 6, 11),
+        gdd_since_budbreak=99)

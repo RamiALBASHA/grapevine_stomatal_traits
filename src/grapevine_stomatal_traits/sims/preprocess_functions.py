@@ -7,10 +7,12 @@ from hydroshoot.display import visu
 from openalea.mtg import mtg
 from openalea.plantgl.scenegraph import Scene
 
-from grapevine_stomatal_traits.sources.config import SiteData, ScenariosRowAngle
+from grapevine_stomatal_traits.sources.config import SiteData
 from grapevine_stomatal_traits.sources.mockups.main_mockups import build_mtg
 
 PATH_PARAMS_BASE = Path(__file__).parent / 'params_base.json'
+
+FMT_DATES = '%Y-%m-%d %H:%M:%S'
 
 
 def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, path_preprocessed_inputs_dir: Path,
@@ -59,14 +61,14 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
     with open(PATH_PARAMS_BASE, mode='r') as f:
         params = load(f)
     params['simulation'].update({
-        "sdate": site_data.date_start_sim,
-        "edate": site_data.date_end_sim,
+        "sdate": site_data.date_start_sim.strftime(FMT_DATES),
+        "edate": site_data.date_end_sim.strftime(FMT_DATES),
         "latitude": site_data.latitude,
         "longitude": site_data.longitude,
         "elevation": site_data.elevation,
-        "meteo": f'../../{weather_file_name}'})
+        "meteo": f'../../../{weather_file_name}'})
     params['irradiance'].update({'scene_rotation': scene_rotation})
-    params['phenology'].update({'emdate': site_data.date_budburst})
+    params['phenology'].update({'emdate': site_data.date_budburst.strftime(FMT_DATES)})
     params['exchange']['par_gs'].update(stomatal_params)
     params['soil'].update({
         'soil_class': site_data.soil_class,
@@ -96,15 +98,12 @@ def prepare_mtg(path_digit: Path, training_system: str, rotation_angle: float, i
     return g
 
 
-def preprocess_inputs_and_params(path_root: Path,
+def preprocess_inputs_and_params(path_root: Path, path_preprocessed_dir: Path,
                                  site_data: SiteData, weather_file_name: str,
-                                 stomatal_params: dict, row_angle_scenario: ScenariosRowAngle,
-                                 gdd_since_budbreak: float = 1000.):
+                                 stomatal_params: dict, row_angle_from_south: float):
     training_system = site_data.training_system
     path_digit = path_root.parents[1] / f'sources/mockups/{training_system}/virtual_digit.csv'
 
-    row_angle_from_south = row_angle_scenario.value
-    path_preprocessed_dir = path_root / 'preprocessed_inputs' / row_angle_scenario.name
     path_preprocessed_dir.mkdir(parents=True, exist_ok=True)
 
     set_params(
@@ -122,7 +121,7 @@ def preprocess_inputs_and_params(path_root: Path,
         grapevine_mtg=grapevine_mtg,
         path_project_dir=path_preprocessed_dir,
         path_preprocessed_inputs_dir=path_preprocessed_dir,
-        gdd_since_budbreak=gdd_since_budbreak,
+        gdd_since_budbreak=site_data.gdd_since_budbreak,
         psi_soil=0,
         scene=scene,
         is_write_hourly_dynamic=True)
