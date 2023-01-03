@@ -2,7 +2,7 @@ from json import dump, load
 from pathlib import Path
 
 from hydroshoot import io, initialisation
-from hydroshoot.architecture import vine_orientation
+from hydroshoot.architecture import vine_orientation, mtg_save_geometry, save_mtg
 from hydroshoot.display import visu
 from openalea.mtg import mtg
 from openalea.plantgl.scenegraph import Scene
@@ -29,6 +29,8 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, path_prepr
 
     with open(path_preprocessed_inputs_dir / 'static.json', mode='w') as f:
         dump(static_data, f, indent=2)
+
+    save_mtg(g=grapevine_mtg, scene=scene, file_path=path_preprocessed_inputs_dir, filename='initial_mtg.pckl')
 
     dynamic_data = {}
     inputs_hourly = io.HydroShootHourlyInputs(psi_soil=inputs.psi_soil_forced, sun2scene=inputs.sun2scene)
@@ -117,6 +119,8 @@ def preprocess_inputs_and_params(path_root: Path, path_preprocessed_dir: Path,
         training_system=training_system,
         rotation_angle=row_angle_from_south)
     scene = visu(grapevine_mtg, def_elmnt_color_dict=True, scene=Scene(), view_result=False)
+    mtg_save_geometry(scene=scene, file_path=path_preprocessed_dir)
+
     preprocess_inputs(
         grapevine_mtg=grapevine_mtg,
         path_project_dir=path_preprocessed_dir,
