@@ -19,7 +19,7 @@ from grapevine_stomatal_traits.simulator.irrigation import handle_irrigation
 
 
 def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_output: Path = None,
-        **kwargs) -> DataFrame:
+        is_save_mtg: bool = False, **kwargs) -> DataFrame:
     """Calculates leaf gas and energy exchange in addition to the hydraulic structure of an individual plant.
 
     Args:
@@ -28,6 +28,7 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
         scene: PlantGl scene (default None)
         write_result: if True then hourly plant-scale outputs are written into a CSV file
         path_output: summary data output file path
+        is_save_mtg: True to save the mtg object (default False)
         kwargs: can include:
             psi_soil_init (float): [MPa] initial soil water potential
             psi_soil (float): [MPa] predawn soil water potential
@@ -59,7 +60,11 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
 
     # Read user parameters
     inputs = io.HydroShootInputs(
-        g=g, path_project=wd, scene=scene, write_result=write_result, path_output_file=path_output, **kwargs)
+        path_project=wd,
+        scene=scene,
+        is_write_result=write_result,
+        path_output_file=path_output,
+        **kwargs)
     io.verify_inputs(g=g, inputs=inputs)
     params = inputs.params
 
@@ -142,7 +147,7 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
             t_soil=inputs_hourly.soil_temperature, t_sky_eff=inputs_hourly.sky_temperature, params=params)
 
         # Write mtg to an external file
-        if scene is not None:
+        if is_save_mtg and (scene is not None):
             architecture.save_mtg(g=g, scene=scene, file_path=inputs.path_output_dir)
 
         # Plot stuff..
