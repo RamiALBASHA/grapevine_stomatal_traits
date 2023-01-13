@@ -69,14 +69,16 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
         "longitude": site_data.longitude,
         "elevation": site_data.elevation,
         "meteo": f'../../../{weather_file_name}'})
-    params['irradiance'].update({'scene_rotation': scene_rotation})
+    params['planting'].update({
+        'spacing_between_rows': site_data.spacing_interrow,
+        'spacing_on_row': site_data.spacing_intrarow,
+        'row_angle_with_south': scene_rotation})
     params['phenology'].update({'emdate': site_data.date_budburst.strftime(FMT_DATES)})
     params['exchange']['par_gs'].update(stomatal_params)
     params['soil'].update({
         'soil_class': site_data.soil_class,
-        'soil_dimensions': [site_data.spacing_interrow,
-                            site_data.spacing_intrarow,
-                            site_data.soil_depth],
+        'soil_dimensions': {
+            'depth': site_data.soil_depth},
         'rhyzo_coeff': site_data.rhyzo_coeff})
     return params
 
