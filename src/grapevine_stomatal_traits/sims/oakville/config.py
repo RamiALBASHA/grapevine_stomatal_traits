@@ -19,16 +19,16 @@ class SiteDataOakville(SiteData):
             rhyzo_coeff=0.75)
 
 
-class ScenariosDatesOakville(Enum):
-    historical: PhenoData = PhenoData(
+ScenariosDatesOakville = [
+    ('historical', PhenoData(
         date_budburst=datetime(1990, 4, 1),
         date_veraison=datetime(1990, 7, 30),
-        gdd_since_budbreak=96)
-    rcp45: PhenoData = PhenoData(
+        gdd_since_budbreak=96)),
+    ('rcp45', PhenoData(
         date_budburst=datetime(1990, 3, 8),
         date_veraison=datetime(1990, 7, 2),
-        gdd_since_budbreak=96)
-    rcp85: PhenoData = PhenoData(
+        gdd_since_budbreak=96)),
+    ('rcp85', PhenoData(
         date_budburst=datetime(1990, 2, 15),
         date_veraison=datetime(1990, 6, 11),
-        gdd_since_budbreak=99)
+        gdd_since_budbreak=99))]
