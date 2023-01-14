@@ -19,16 +19,16 @@ class SiteDataFresno(SiteData):
             rhyzo_coeff=0.75)
 
 
-class ScenariosDatesFresno(Enum):
-    historical: PhenoData = PhenoData(
+ScenariosDatesFresno = [
+    ('historical', PhenoData(
         date_budburst=datetime(1990, 3, 25),
         date_veraison=datetime(1990, 7, 15),
-        gdd_since_budbreak=98)
-    rcp45: PhenoData = PhenoData(
+        gdd_since_budbreak=98)),
+    ('rcp45', PhenoData(
         date_budburst=datetime(1990, 2, 27),
         date_veraison=datetime(1990, 6, 20),
-        gdd_since_budbreak=99)
-    rcp85: PhenoData = PhenoData(
+        gdd_since_budbreak=99)),
+    ('rcp85', PhenoData(
         date_budburst=datetime(1990, 2, 7),
         date_veraison=datetime(1990, 6, 6),
-        gdd_since_budbreak=99)
+        gdd_since_budbreak=99))]
