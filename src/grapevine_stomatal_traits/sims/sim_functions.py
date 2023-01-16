@@ -1,4 +1,4 @@
-from json import load
+from json import load, dump
 from pathlib import Path
 
 from hydroshoot.architecture import load_mtg
@@ -6,18 +6,26 @@ from openalea.mtg.mtg import MTG
 from openalea.plantgl.scenegraph import Scene
 
 from grapevine_stomatal_traits.simulator import hydroshoot_wrapper
-from grapevine_stomatal_traits.sources.config import ScenariosRowAngle
+from grapevine_stomatal_traits.sources.config import ScenariosRowAngle, ScenariosTraits
 
 
 def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_dir: Path,
-                     row_angle_scenario: ScenariosRowAngle, climate_scenario: list):
-    path_output = path_root / 'output' / climate_scenario[0] / row_angle_scenario.name
+                     row_angle_scenario: ScenariosRowAngle, climate_scenario: list,
+                     stomatal_traits_scenario: ScenariosTraits):
+    path_output = path_root / 'output' / climate_scenario[0] / row_angle_scenario.name / stomatal_traits_scenario.name
     path_output.mkdir(exist_ok=True, parents=True)
 
     with open(path_preprocessed_dir / 'static.json') as f:
         static_inputs = load(f)
     with open(path_preprocessed_dir / 'dynamic.json') as f:
         dynamic_inputs = load(f)
+
+    with open(path_preprocessed_dir / 'params_for_sims.json', mode='r') as f:
+        params = load(f)
+
+    params['exchange']['par_gs'].update(stomatal_traits_scenario.value)
+    with open(path_preprocessed_dir / 'params.json', mode='w') as f:
+        dump(params, f)
 
     hydroshoot_wrapper.run(
         g=g,
@@ -36,7 +44,8 @@ def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_di
     pass
 
 
-def run_simulations(path_root: Path, scenario_dates: list, scenario_angle: ScenariosRowAngle):
+def run_simulations(path_root: Path, scenario_dates: list, scenario_angle: ScenariosRowAngle,
+                    scenario_traits: ScenariosTraits):
     print('-' * 30)
     print(f'climate scenario: {scenario_dates[0]}\nrow orientation: {scenario_angle.name}')
 
@@ -52,6 +61,7 @@ def run_simulations(path_root: Path, scenario_dates: list, scenario_angle: Scena
         path_root=path_root,
         path_preprocessed_dir=path_preprocessed_dir,
         row_angle_scenario=scenario_angle,
-        climate_scenario=scenario_dates)
+        climate_scenario=scenario_dates,
+        stomatal_traits_scenario=scenario_traits)
 
     pass
