@@ -1,17 +1,25 @@
 from datetime import datetime
+from itertools import product
+from multiprocessing import Pool
 from pathlib import Path
+from typing import Iterable
 
 from grapevine_stomatal_traits.sims.oakville.config import ScenariosDatesOakville
 from grapevine_stomatal_traits.sims.sim_functions import run_simulations
 from grapevine_stomatal_traits.sources.config import ScenariosRowAngle
 
+
+def run_sims(args):
+    return run_simulations(*args)
+
+
+def mp(sim_args: Iterable, nb_cpu: int = 2):
+    with Pool(nb_cpu) as p:
+        p.map(run_sims, sim_args)
+
+
 if __name__ == '__main__':
     time_on = datetime.now()
-
-    run_simulations(
-        path_root=Path(__file__).parent.resolve(),
-        scenario_dates=ScenariosDatesOakville,
-        scenarios_row_angle=ScenariosRowAngle)
-
+    mp(sim_args=product([Path(__file__).parent.resolve()], ScenariosDatesOakville, ScenariosRowAngle), nb_cpu=4)
     time_off = datetime.now()
     print(f"--- Total runtime: {(time_off - time_on).seconds} sec ---")
