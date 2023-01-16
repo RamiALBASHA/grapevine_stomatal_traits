@@ -92,6 +92,14 @@ def set_params(path_project_dir: Path, site_data: SiteData, stomatal_params: dic
     pass
 
 
+def set_initial_predawn_soil_water_potential(path_project_dir: Path, site_data: SiteData):
+    with(open(path_project_dir / 'psi_soil.input', mode='w')) as f:
+        f.write('time;psi\n')
+        f.write(f"{site_data.date_start_sim.strftime('%Y-%m-%d')};-0.01")
+
+    pass
+
+
 def prepare_mtg(path_digit: Path, training_system: str, rotation_angle: float, is_leaf_follow_cordon: bool = True):
     g = build_mtg(
         path_csv=path_digit,
@@ -116,6 +124,9 @@ def preprocess_inputs_and_params(path_root: Path, path_preprocessed_dir: Path,
         stomatal_params=stomatal_params,
         rotation_angle=row_angle_from_south,
         weather_file=weather_file_name)
+    set_initial_predawn_soil_water_potential(
+        path_project_dir=path_preprocessed_dir,
+        site_data=site_data)
     grapevine_mtg = prepare_mtg(
         path_digit=path_digit,
         training_system=training_system,
