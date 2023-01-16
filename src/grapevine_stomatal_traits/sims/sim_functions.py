@@ -50,7 +50,7 @@ def run_simulations(path_root: Path, scenario_dates: list, scenario_angle: Scena
         g=g,
         scene=scene,
         path_root=path_root,
-        path_preprocessed_dir=path_root / 'preprocessed_inputs' / scenario_dates[0] / scenario_angle.name,
+        path_preprocessed_dir=path_preprocessed_dir,
         row_angle_scenario=scenario_angle,
         climate_scenario=scenario_dates)
 
