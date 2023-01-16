@@ -3,8 +3,6 @@ from enum import Enum
 
 from dateutil.relativedelta import relativedelta
 
-SCENARIOS_CLIMATE = ('historical', 'rcp45', 'rcp85')
-
 
 class PhenoData:
     def __init__(self, date_budburst: datetime, date_veraison: datetime, gdd_since_budbreak: float):
