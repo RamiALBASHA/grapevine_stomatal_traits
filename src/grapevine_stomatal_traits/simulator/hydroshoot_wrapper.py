@@ -19,7 +19,7 @@ from grapevine_stomatal_traits.simulator.irrigation import handle_irrigation
 
 
 def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_output: Path = None,
-        is_save_mtg: bool = False, **kwargs) -> DataFrame:
+        is_save_mtg: bool = True, **kwargs) -> DataFrame:
     """Calculates leaf gas and energy exchange in addition to the hydraulic structure of an individual plant.
 
     Args:
