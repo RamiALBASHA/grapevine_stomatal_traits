@@ -89,6 +89,9 @@ def set_params(path_project_dir: Path, site_data: SiteData, stomatal_params: dic
                             weather_file_name=weather_file)
     with open(path_project_dir / 'params.json', mode='w') as f:
         dump(params, f, indent=2)
+    with open(path_project_dir / 'params_for_sims.json', mode='w') as f:
+        dump(params, f, indent=2)
+
     pass
 
 
