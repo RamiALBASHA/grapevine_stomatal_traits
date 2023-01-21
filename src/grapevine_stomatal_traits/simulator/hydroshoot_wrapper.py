@@ -106,6 +106,7 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
     an_ls = []
     rg_ls = []
     irrigation_ls = []
+    psi_collar_ls = []
     psi_soil_ls = []
     leaf_temperature_dict = {}
 
@@ -162,7 +163,8 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
 
         an_ls.append(g.node(g.node(g.root).vid_collar).FluxC)
 
-        psi_soil_ls.append(g.node(g.node(g.root).vid_collar).psi_head)
+        psi_soil_ls.append(inputs_hourly.psi_soil)
+        psi_collar_ls.append(g.node(g.node(g.root).vid_collar).psi_head)
 
         leaf_temperature_dict[date] = deepcopy(g.property('Tlc'))
 
@@ -178,6 +180,8 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
         print(f'flux C2O {g.node(g.node(g.root).vid_collar).FluxC}')
         print(f'Tleaf {np.median([g.node(vid).Tlc for vid in g.property("gs").keys()]):.2f}', ' ',
               f'Tair {inputs_hourly.weather.loc[date, "Tac"]:.2f}')
+        print('')
+        print(f'irrigation: {irrigation_rate}')
         print('')
         print("=" * 72)
 
@@ -204,7 +208,8 @@ def run(g: MTG, wd: Path, scene: Scene = None, write_result: bool = True, path_o
         # 'sapWest': sapWest,
         'Tleaf': t_ls,
         'irr': irrigation_ls,
-        'psi_soil': psi_soil_ls},
+        'psi_soil': psi_soil_ls,
+        'psi_collar': psi_collar_ls},
         index=params.simulation.date_range)
 
     # Write
