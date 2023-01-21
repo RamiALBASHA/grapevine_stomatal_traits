@@ -43,7 +43,7 @@ class HydroShootHourlyInputs(object):
             else:
                 self.psi_soil = soil_water_potential(
                     psi_soil_init=self.psi_soil,
-                    water_withdrawal=0,  # water withdrawal will be considered later in the solver
+                    water_withdrawal=g.node(g.node(g.root).vid_collar).Flux * params.simulation.conv_to_second,  # water withdrawal will be considered later in the solver
                     water_input=water_input,
                     soil_class=params.soil.soil_class,
                     soil_total_volume=params.soil.soil_total_volume,
