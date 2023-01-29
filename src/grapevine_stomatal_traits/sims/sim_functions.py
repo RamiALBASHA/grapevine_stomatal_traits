@@ -24,12 +24,11 @@ def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_di
         params = load(f)
 
     params['exchange']['par_gs'].update(stomatal_traits_scenario.value)
-    with open(path_preprocessed_dir / 'params.json', mode='w') as f:
-        dump(params, f)
 
     hydroshoot_wrapper.run(
         g=g,
         wd=path_preprocessed_dir,
+        params=params,
         scene=scene,
         path_output=path_output / 'time_series.csv',
         gdd_since_budbreak=climate_scenario[1].gdd_since_budbreak,
