@@ -12,7 +12,8 @@ from grapevine_stomatal_traits.sources.config import ScenariosRowAngle, Scenario
 def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_dir: Path,
                      row_angle_scenario: ScenariosRowAngle, climate_scenario: list,
                      stomatal_traits_scenario: ScenariosTraits):
-    path_output = path_root / 'output' / climate_scenario[0] / row_angle_scenario.name / stomatal_traits_scenario.name
+    path_data = path_root.home() / '../../mnt/data/hydroshoot/project_megan/simulation_results' / path_root.name
+    path_output = path_data / climate_scenario[0] / row_angle_scenario.name / stomatal_traits_scenario.name
     path_output.mkdir(exist_ok=True, parents=True)
 
     with open(path_preprocessed_dir / 'static.json') as f:
