@@ -39,7 +39,7 @@ def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_di
         psi_soil_init=-0.6,
         drip_rate=3.8,
         replacement_fraction=0.6,
-        irrigation_freq=2)
+        irrigation_freq=7)
 
     pass
 
