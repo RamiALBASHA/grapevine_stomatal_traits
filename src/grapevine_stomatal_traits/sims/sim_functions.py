@@ -21,7 +21,7 @@ def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_di
     with open(path_preprocessed_dir / 'dynamic.json') as f:
         dynamic_inputs = load(f)
 
-    with open(path_preprocessed_dir / 'params_for_sims.json', mode='r') as f:
+    with open(path_preprocessed_dir / 'params.json', mode='r') as f:
         params = load(f)
 
     params['exchange']['par_gs'].update(stomatal_traits_scenario.value)
