@@ -98,8 +98,7 @@ def set_params(path_project_dir: Path, site_data: SiteData, stomatal_params: dic
 def set_initial_predawn_soil_water_potential(path_project_dir: Path, site_data: SiteData):
     with(open(path_project_dir / 'psi_soil.input', mode='w')) as f:
         f.write('time;psi\n')
-        f.write(f"{site_data.date_start_sim.strftime('%Y-%m-%d')};-0.01")
-
+        f.write(f"{site_data.date_start_sim.strftime('%Y-%m-%d')};{site_data.initial_soil_water_potential}")
     pass
 
 
