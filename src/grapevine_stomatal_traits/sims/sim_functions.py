@@ -36,7 +36,6 @@ def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_di
         form_factors=static_inputs['form_factors'],
         leaf_nitrogen=static_inputs['Na'],
         leaf_ppfd=dynamic_inputs,
-        psi_soil_init=-0.6,
         drip_rate=3.8,
         replacement_fraction=0.6,
         irrigation_freq=7)
