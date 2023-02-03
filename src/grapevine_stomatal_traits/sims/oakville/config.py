@@ -16,7 +16,8 @@ class SiteDataOakville(SiteData):
             spacing_interrow=1.8,
             spacing_intrarow=1.8,
             soil_depth=2.,
-            rhyzo_coeff=0.75)
+            rhyzo_coeff=0.75,
+            initial_soil_water_potential=-0.6)
 
 
 ScenariosDatesOakville = [
