@@ -43,5 +43,5 @@ class ScenariosTraits(Enum):
 
 class ScenariosRowAngle(Enum):
     north_south: float = 0.
-    northeast_southwest: float = 45.
+    # northeast_southwest: float = 45.
     east_west: float = 90.
