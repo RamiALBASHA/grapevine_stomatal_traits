@@ -140,3 +140,5 @@ example/**/preprocessed_inputs
 **/sims/**/preprocessed_inputs
 **/sims/**/params.json
 **/sources/misc/
+**/analysis/figs/
+**/analysis/outputs/
