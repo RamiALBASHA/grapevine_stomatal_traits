@@ -36,7 +36,7 @@ class ScenariosTraits(Enum):
     baseline: dict = {"g0": 0.01145, 'm0': 5.06, 'psi0': -1.27}
     low_gmax: dict = {"g0": 0.01145, 'm0': 1.72, 'psi0': -1.27}
     high_gmax: dict = {"g0": 0.01145, 'm0': 7.04, 'psi0': -1.27}
-    high_gsp50: dict = {"g0": 0.01145, 'm0': 5.06, 'psi0': 0.93}
+    high_gsp50: dict = {"g0": 0.01145, 'm0': 5.06, 'psi0': -0.93}
     low_gsp50: dict = {"g0": 0.01145, 'm0': 5.06, 'psi0': -1.54}
     elite: dict = {"g0": 0.01165, 'm0': 0.8925, 'psi0': -0.85}
 
