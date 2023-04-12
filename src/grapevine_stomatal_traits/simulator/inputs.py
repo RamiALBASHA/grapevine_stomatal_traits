@@ -46,7 +46,7 @@ class HydroShootHourlyInputs(object):
                     water_withdrawal=g.node(g.node(g.root).vid_collar).Flux * params.simulation.conv_to_second,  # water withdrawal will be considered later in the solver
                     water_input=water_input,
                     soil_class=params.soil.soil_class,
-                    soil_total_volume=params.soil.rhyzo_total_volume,
+                    soil_total_volume=params.soil.soil_volume,
                     psi_min=params.hydraulic.psi_min)
 
         pass
