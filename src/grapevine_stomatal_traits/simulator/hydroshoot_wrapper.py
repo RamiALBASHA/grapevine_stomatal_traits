@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from hydroshoot import (architecture, solver, io)
 from hydroshoot.energy import calc_effective_sky_temperature
-from hydroshoot.initialisation import init_model, init_hourly
+from hydroshoot.initialisation import init_model, init_hourly, set_collar_water_potential_function
 from openalea.mtg.mtg import MTG
 from openalea.plantgl.all import Scene, surface
 from pandas import DataFrame
@@ -100,6 +100,8 @@ def run(g: MTG, wd: Path, params: dict, scene: Scene = None, write_result: bool 
     else:
         psi_soil = None
 
+    calc_collar_water_potential = set_collar_water_potential_function(params=params)
+
     # ==============================================================================
     # Simulations
     # ==============================================================================
@@ -147,7 +149,8 @@ def run(g: MTG, wd: Path, params: dict, scene: Scene = None, write_result: bool 
 
         solver.solve_interactions(
             g=g, meteo=inputs_hourly.weather.loc[date], psi_soil=inputs_hourly.psi_soil,
-            t_soil=inputs_hourly.soil_temperature, t_sky_eff=inputs_hourly.sky_temperature, params=params)
+            t_soil=inputs_hourly.soil_temperature, t_sky_eff=inputs_hourly.sky_temperature, params=params,
+            calc_collar_water_potential=calc_collar_water_potential)
 
         # Write mtg to an external file
         if is_save_mtg and (scene is not None):
