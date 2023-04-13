@@ -79,7 +79,9 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
         'soil_class': site_data.soil_class,
         'soil_dimensions': {
             'depth': site_data.soil_depth},
-        'rhyzo_coeff': site_data.rhyzo_coeff})
+        'rhyzo_coeff': site_data.rhyzo_coeff,
+        'root_radius': site_data.root_radius,
+        'root_length': site_data.root_length})
     return params
 
 
