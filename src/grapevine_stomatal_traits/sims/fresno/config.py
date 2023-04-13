@@ -16,7 +16,7 @@ class SiteDataFresno(SiteData):
             spacing_interrow=1.8,
             spacing_intrarow=2.2,
             soil_depth=2.,
-            rhyzo_coeff=0.75,
+            rhyzo_coeff=0.65,
             root_radius=0.001,
             root_length=200,
             initial_soil_water_potential=-0.6)
