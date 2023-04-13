@@ -15,7 +15,8 @@ class PhenoData:
 class SiteData(object):
     def __init__(self, pheno_data: PhenoData, latitude: float, longitude: float,
                  elevation: float, training_system: str, soil_class: str, spacing_interrow: float,
-                 spacing_intrarow: float, soil_depth: float, rhyzo_coeff: float, initial_soil_water_potential: float):
+                 spacing_intrarow: float, soil_depth: float, rhyzo_coeff: float, root_radius: float, root_length: float,
+                 initial_soil_water_potential: float):
         self.date_budburst = pheno_data.date_budbreak
         self.date_start_sim = pheno_data.date_start_sim
         self.date_end_sim = pheno_data.date_end_sim
@@ -29,6 +30,9 @@ class SiteData(object):
         self.spacing_intrarow = spacing_intrarow
         self.soil_depth = soil_depth
         self.rhyzo_coeff = rhyzo_coeff
+        self.root_radius = root_radius
+        self.root_length = root_length
+
         self. initial_soil_water_potential = initial_soil_water_potential
 
 

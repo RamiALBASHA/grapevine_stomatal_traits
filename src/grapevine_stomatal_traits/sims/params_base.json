@@ -177,6 +177,8 @@
   "soil": {
     "soil_class": null,
     "soil_dimensions": null,
-    "rhyzo_coeff": null
+    "rhyzo_coeff": null,
+    "root_radius": null,
+    "root_length": null
   }
 }
