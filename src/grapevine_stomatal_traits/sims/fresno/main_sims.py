@@ -21,6 +21,6 @@ def mp(sim_args: Iterable, nb_cpu: int = 2):
 if __name__ == '__main__':
     time_on = datetime.now()
     mp(sim_args=product([Path(__file__).parent.resolve()], ScenariosDatesFresno, ScenariosRowAngle, ScenariosTraits),
-       nb_cpu=4)
+       nb_cpu=12)
     time_off = datetime.now()
     print(f"--- Total runtime: {(time_off - time_on).seconds} sec ---")
