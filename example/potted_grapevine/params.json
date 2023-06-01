@@ -5,14 +5,17 @@
     "latitude": 43.61,
     "longitude": 3.87,
     "elevation": 44.0,
-	"meteo": "weather.csv",
     "tzone": "Europe/Paris",
     "output_index": "",
     "unit_scene_length": "cm",
     "hydraulic_structure": true,
     "negligible_shoot_resistance": false,
-    "energy_budget": true,
-    "soil_water_deficit": true
+    "energy_budget": true
+  },
+  "planting": {
+    "spacing_between_rows": 3.6,
+    "spacing_on_row": 1.0,
+    "row_angle_with_south": 0.0
   },
   "phenology": {
     "emdate": "2012-03-01 00:00:00",
@@ -65,7 +68,6 @@
         ]
       }
     },
-    "scene_rotation": 0.0,
     "turtle_format": "soc",
     "turtle_sectors": "46",
     "icosphere_level": null
@@ -106,6 +108,7 @@
       "n": 4.0
     },
     "par_photo": {
+      "alpha": 0.24,
       "Vcm25": 89.0,
       "Jm25": 143.0,
       "cRd": 0.008,
@@ -144,10 +147,10 @@
         "deltaHa": 37.83
       },
       "photo_inhibition": {
-        "dhd_inhib_beg":195,
-        "dHd_inhib_max":190,
-        "psi_inhib_beg":-1.5,
-        "psi_inhib_max":-3,
+        "dhd_inhib_beg": 195,
+        "dHd_inhib_max": 190,
+        "psi_inhib_beg": -1.5,
+        "psi_inhib_max": -3,
         "temp_inhib_beg": 35,
         "temp_inhib_max": 40
       }
@@ -173,13 +176,9 @@
   },
   "soil": {
     "soil_class": "Clay_Loam",
-    "soil_dimensions": [
-      3.6,
-      1.0,
-      1.2
-    ],
+    "soil_dimensions": {
+      "depth": 1.2
+    },
     "rhyzo_coeff": 0.5
   }
 }
-
-

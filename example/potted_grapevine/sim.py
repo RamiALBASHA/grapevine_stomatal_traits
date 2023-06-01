@@ -18,14 +18,21 @@ if __name__ == '__main__':
         static_inputs = load(f)
     with open(path_preprocessed_data / 'dynamic.json') as f:
         dynamic_inputs = load(f)
+    with open(path_project / 'params.json', mode='r') as f:
+        params = load(f)
 
     summary_results = hydroshoot_wrapper.run(
-        g=g, wd=path_project, scene=scene, gdd_since_budbreak=1000.,
+        g=g,
+        wd=path_project,
+        params=params,
+        path_weather=path_project / 'weather.csv',
+        scene=scene,
+        path_output=path_project / 'output' / 'time_series_with_preprocessed_data.csv',
+        gdd_since_budbreak=1000.,
         form_factors=static_inputs['form_factors'],
         leaf_nitrogen=static_inputs['Na'],
         leaf_ppfd=dynamic_inputs,
         # psi_soil_init=-0.5,
         drip_rate=3.8,
         replacement_fraction=0.6,
-        irrigation_freq=2,
-        path_output=path_project / 'output' / 'time_series_with_preprocessed_data.csv')
+        irrigation_freq=2)
