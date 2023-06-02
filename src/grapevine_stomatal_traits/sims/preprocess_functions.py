@@ -16,11 +16,18 @@ FMT_DATES = '%Y-%m-%d %H:%M:%S'
 
 
 def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, path_preprocessed_inputs_dir: Path,
-                      psi_soil: float, scene: Scene, is_write_hourly_dynamic: bool = False, **kwargs):
+                      path_weather: Path, psi_soil: float, scene: Scene, is_write_hourly_dynamic: bool = False,
+                      **kwargs):
     path_preprocessed_inputs_dir.mkdir(parents=True, exist_ok=True)
 
     inputs = io.HydroShootInputs(
-        g=grapevine_mtg, path_project=path_project_dir, scene=scene, psi_soil=psi_soil, **kwargs)
+        path_project=path_project_dir,
+        path_weather=path_weather,
+        scene=scene,
+        user_params=None,
+        psi_soil=psi_soil,
+        **kwargs)
+
     io.verify_inputs(g=grapevine_mtg, inputs=inputs)
     grapevine_mtg = initialisation.init_model(g=grapevine_mtg, inputs=inputs)
 
@@ -59,7 +66,7 @@ def preprocess_inputs(grapevine_mtg: mtg.MTG, path_project_dir: Path, path_prepr
         dump(dynamic_data, f, indent=2)
 
 
-def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: float, weather_file_name: str) -> dict:
+def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: float) -> dict:
     with open(PATH_PARAMS_BASE, mode='r') as f:
         params = load(f)
     params['simulation'].update({
@@ -67,8 +74,7 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
         "edate": site_data.date_end_sim.strftime(FMT_DATES),
         "latitude": site_data.latitude,
         "longitude": site_data.longitude,
-        "elevation": site_data.elevation,
-        "meteo": f'../../../{weather_file_name}'})
+        "elevation": site_data.elevation})
     params['planting'].update({
         'spacing_between_rows': site_data.spacing_interrow,
         'spacing_on_row': site_data.spacing_intrarow,
@@ -85,10 +91,8 @@ def prepare_params(site_data: SiteData, stomatal_params: dict, scene_rotation: f
     return params
 
 
-def set_params(path_project_dir: Path, site_data: SiteData, stomatal_params: dict, rotation_angle: float,
-               weather_file: str):
-    params = prepare_params(site_data=site_data, stomatal_params=stomatal_params, scene_rotation=rotation_angle,
-                            weather_file_name=weather_file)
+def set_params(path_project_dir: Path, site_data: SiteData, stomatal_params: dict, rotation_angle: float):
+    params = prepare_params(site_data=site_data, stomatal_params=stomatal_params, scene_rotation=rotation_angle)
     with open(path_project_dir / 'params.json', mode='w') as f:
         dump(params, f, indent=2)
     pass
@@ -123,8 +127,7 @@ def preprocess_inputs_and_params(path_root: Path, path_preprocessed_dir: Path,
         path_project_dir=path_preprocessed_dir,
         site_data=site_data,
         stomatal_params=stomatal_params,
-        rotation_angle=row_angle_from_south,
-        weather_file=weather_file_name)
+        rotation_angle=row_angle_from_south)
     set_initial_predawn_soil_water_potential(
         path_project_dir=path_preprocessed_dir,
         site_data=site_data)
@@ -139,6 +142,7 @@ def preprocess_inputs_and_params(path_root: Path, path_preprocessed_dir: Path,
         grapevine_mtg=grapevine_mtg,
         path_project_dir=path_preprocessed_dir,
         path_preprocessed_inputs_dir=path_preprocessed_dir,
+        path_weather=path_root / weather_file_name,
         gdd_since_budbreak=site_data.gdd_since_budbreak,
         psi_soil=0,
         scene=scene,

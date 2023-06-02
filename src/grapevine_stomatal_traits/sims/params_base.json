@@ -5,7 +5,6 @@
     "latitude": null,
     "longitude": null,
     "elevation": null,
-    "meteo": "weather.csv",
     "tzone": "America/Los_Angeles",
     "output_index": "",
     "unit_scene_length": "cm",
@@ -109,6 +108,7 @@
       "n": 4.0
     },
     "par_photo": {
+      "alpha": 0.24,
       "Vcm25": 89.0,
       "Jm25": 143.0,
       "cRd": 0.008,

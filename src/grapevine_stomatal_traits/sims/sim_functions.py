@@ -20,7 +20,6 @@ def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_di
         static_inputs = load(f)
     with open(path_preprocessed_dir / 'dynamic.json') as f:
         dynamic_inputs = load(f)
-
     with open(path_preprocessed_dir / 'params.json', mode='r') as f:
         params = load(f)
 
@@ -30,6 +29,7 @@ def _run_simulations(g: MTG, scene: Scene, path_root: Path, path_preprocessed_di
         g=g,
         wd=path_preprocessed_dir,
         params=params,
+        path_weather=path_root / f'weather_{path_root.stem}_{climate_scenario[0]}.csv',
         scene=scene,
         path_output=path_output / 'time_series.csv',
         gdd_since_budbreak=climate_scenario[1].gdd_since_budbreak,
