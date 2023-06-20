@@ -1,0 +1,61 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf600
+{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red251\green2\blue7;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c14913\c0;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
+sources/config.py BASELINE IS CURRENTLY SET TO FRESNO VALUES - CHANGE BEFORE SIMULATING OAKVILLE\
+
+\f1\b0 \cf2 TOP SIX LINES ARE FOR FRESNO, BOTTOM SIX ARE FOR OAKVILLE
+\f0\b \cf2 \
+\
+sims/sim_functions.py IS CURRENTLY SET TO FRESNO VALUES FOR IRRIGATION - CHANGE BEFORE SIMULATING OAKVILLE\
+\
+CURRENTLY SET FOR EAST/WEST\
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
+
+\f1\b0 \cf0 \
+\
+\
+Changes to parameters:\
+\
+Fresno: \
+"spacing_between_rows": 3.0, # 10 ft spacing (prev 1.8m)\
+"min_kmax": 0.00005 # prev 0.01\
+ "fifty_cent": -2.25,  # prev -0.51\
+\
+\
+Oakville:\
+\'93spacing_between_rows\'94: 2.1 # 7 ft spacing prev 1.8m\
+"min_kmax": 0.00005 # prev 0.01\
+ "fifty_cent": -2.25,  # prev -0.51\
+\'93root_length\'94:1000, # prev 3000.0\
+rhizo_coef = 0.65, # prev 0.75\
+\
+\
+Set irrigation frequency in sims/sim_functions.py\
+# Fresno: \
+replacement_fraction=0.8\
+irrigation_freq=3\
+\
+#Oakville:\
+replacement_fraction=0.6\
+irrigation_freq=7\
+\
+\
+\
+Turn off some trait scenarios (for faster testing):\
+sources/config.py\
+\
+Turn off some climate scenarios (for faster testing);\
+fresno/config.py or\
+oakville/config.py\
+\
+\
+# Two Fresno sims: 63388 sec\
+\
+Kmin = 0.0005 - Oakville ranges from -0.75 to -1.15, mean (sunlit) = -1.06\
+Kmin = 0.0002 - Oakville ranges from -0.75 to -1.54, mean (sunlit) = - 1.33, weird skew\
+Kmin = 0.0005 - Fresno ranges from -1.1 to -1.91, mean (sunlit) = -1.61, slight skew but ok}
