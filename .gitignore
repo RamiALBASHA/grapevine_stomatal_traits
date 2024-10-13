@@ -129,8 +129,6 @@ dmypy.json
 .pyre/
 
 
-refs/
-*.png
 example/**/output
 example/**/preprocessed_inputs
 
@@ -139,6 +137,4 @@ example/**/preprocessed_inputs
 **/sims/**/output
 **/sims/**/preprocessed_inputs
 **/sims/**/params.json
-**/sources/misc/
-**/analysis/figs/
-**/analysis/outputs/
+**/sources/misc/experiment/
